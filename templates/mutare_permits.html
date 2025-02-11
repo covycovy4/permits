@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutare District Permits</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Mutare District Permit Submissions</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Origin District</th>
+                <th>Destination District</th>
+                <th>Origin Status</th>
+                <th>Destination Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for permit in permits %}
+            <tr>
+                <td>{{ permit.date }}</td>
+                <td>{{ permit.name }}</td>
+                <td>{{ permit.origin_district }}: {{ permit.origin_status }}</td>
+                <td>{{ permit.destination_district }}: {{ permit.destination_status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
+

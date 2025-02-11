@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutare District Permit Submissions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Basic styling for tables and popup */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+            cursor: pointer;
+        }
+        .popup, .overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+        .popup {
+            width: 15cm;
+            height: auto;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .overlay {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .popup h3 {
+            margin-top: 0;
+        }
+        .close-popup {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            cursor: pointer;
+            color: #007BFF;
+        }
+        button {
+            cursor: pointer;
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .approve-btn {
+            background-color: #4CAF50;
+        }
+        .approve-btn:hover {
+            background-color: #45a049;
+        }
+        .disapprove-btn {
+            background-color: #FF6347;
+        }
+        .disapprove-btn:hover {
+            background-color: #FF4500;
+        }
+        .scrollable-container {
+            height: 100vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div class="scrollable-container">
+    <div class="container">
+        <div class="header">
+            <h1>Mutare District Permit Submissions</h1>
+            <a href="{{ url_for('main.submissions_page') }}" class="submit-btn">Back to All Submissions</a>
+        </div>
+        
+        <!-- Permit Submissions Table -->
+        <table id="permitTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Origin District</th>
+                    <th>Destination District</th>
+                    <th>Number of Animals</th>
+                    <th>Payment Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic rows will be appended here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Popup for Disapproval Reason -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <h3>Provide Disapproval Reason</h3>
+        <textarea id="disapprovalReason" rows="4" cols="50" placeholder="Enter reason for disapproval"></textarea>
+        <button onclick="submitDisapproval()">Submit</button>
+        <span class="close-popup" onclick="closePopup()">Close</span>
+    </div>
+</div>
+
+<script>
+    let disapprovalId = null;
+
+    // Fetch and display submissions
+    async function fetchMutareSubmissions() {
+        try {
+            const response = await fetch('/api/mutare_submissions'); 
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const permits = await response.json();
+            console.log("Fetched permits:", permits); // Debugging log
+
+            const tableBody = document.getElementById('permitTable').querySelector('tbody');
+            tableBody.innerHTML = ''; // Clear existing table rows
+
+            const userRole = localStorage.getItem("userRole"); // Retrieve user role from storage
+
+            permits.forEach(permit => {
+                const row = document.createElement('tr');
+                row.dataset.id = permit.id;
+
+                let actionButtons = "";
+                if (userRole === "district") {
+                    actionButtons = `
+                        <button class="approve-btn" onclick="approvePermit(${permit.id})">Approve</button>
+                        <button class="disapprove-btn" onclick="showDisapprovalPopup(${permit.id})">Disapprove</button>
+                    `;
+                } else if (userRole === "veo") {
+                    actionButtons = `<button class="disabled-btn" disabled>Not authorized</button>`;
+                }
+
+                row.innerHTML = `
+                    <td>${permit.date}</td>
+                    <td>${permit.name}</td>
+                    <td>${permit.origin_district}</td>
+                    <td>${permit.destination_district}</td>
+                    <td>${permit.number_of_animals}</td>
+                    <td>${permit.payment_amount}</td>
+                    <td id="permit-status-${permit.id}">${permit.status || 'Pending'}</td>
+                    <td>${actionButtons}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+        } catch (error) {
+            console.error('Error fetching submissions:', error);
+            alert(`Failed to fetch submissions: ${error.message}`);
+        }
+    }
+
+    // Show disapproval popup
+    function showDisapprovalPopup(permitId) {
+        disapprovalId = permitId;
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('popup').style.display = 'block';
+    }
+
+    // Close disapproval popup
+    function closePopup() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('popup').style.display = 'none';
+    }
+
+    // Submit disapproval reason
+    function submitDisapproval() {
+        const reason = document.getElementById('disapprovalReason').value;
+
+        if (reason.trim()) {
+            fetch(`/permit/${disapprovalId}/disapprove`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Permit disapproved successfully!');
+                document.getElementById(`permit-status-${disapprovalId}`).innerText = 'Disapproved';
+                closePopup();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting disapproval.');
+            });
+        } else {
+            alert('Please enter a reason for disapproval.');
+        }
+    }
+
+    // Approve permit
+    function approvePermit(permitId) {
+        fetch(`/permit/${permitId}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Permit approved successfully!');
+            document.getElementById(`permit-status-${permitId}`).innerText = 'Approved';
+        })
+        .catch(error => {
+            console.error('Error approving permit:', error);
+            alert('Error approving permit.');
+        });
+    }
+
+    // Run fetchMutareSubmissions when page loads
+    document.addEventListener("DOMContentLoaded", fetchMutareSubmissions);
+</script>
+
+</html>
+

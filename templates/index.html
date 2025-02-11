@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+        <input type="text" id="username" class="input-field" placeholder="Username" required>
+        <input type="password" id="password" class="input-field" placeholder="Password" required>
+        <button type="submit" class="submit-btn">Login</button>
+    </form>
+    <div id="errorMessage" class="error-message">Invalid username or password. Please try again.</div>
+</div>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const users = {
+            // District Officers
+            "userBUHERA": { password: "buhera123", role: "district", redirect: "/buhera_submissions" },
+            "userRUSAPE": { password: "rusape123", role: "district", redirect: "/rusape_submissions" },
+            "userMUTARE": { password: "mutare123", role: "district", redirect: "/mutare_submissions" },
+            "userCHIPINGE": { password: "chipinge123", role: "district", redirect: "/chipinge_submissions" },
+            "userMAKONI": { password: "makoni123", role: "district", redirect: "/makoni_submissions" },
+            "userNYANGA": { password: "nyanga123", role: "district", redirect: "/nyanga_submissions" },
+            "userMUTASA": { password: "mutasa123", role: "district", redirect: "/mutasa_submissions" },
+            "userADMIN": { password: "admin123", role: "admin", redirect: "/submissions" },
+
+            // VEO Officers
+            "userBUHERAveo": { password: "buhera1234", role: "veo", redirect: "/buhera_submissions" },
+            "userRUSAPEveo": { password: "rusape1234", role: "veo", redirect: "/rusape_submissions" },
+            "userMUTAREveo": { password: "mutare1234", role: "veo", redirect: "/mutare_submissions" },
+            "userCHIPINGEveo": { password: "chipinge1234", role: "veo", redirect: "/chipinge_submissions" },
+            "userMAKONIveo": { password: "makoni1234", role: "veo", redirect: "/makoni_submissions" },
+            "userNYANGAveo": { password: "nyanga1234", role: "veo", redirect: "/nyanga_submissions" },
+            "userMUTASAveo": { password: "mutasa1234", role: "veo", redirect: "/mutasa_submissions" }
+        };
+
+        if (users[username] && users[username].password === password) {
+            localStorage.setItem("userRole", users[username].role);  // Store role in localStorage
+            window.location.href = users[username].redirect;
+        } else {
+            document.getElementById("errorMessage").style.display = "block";
+        }
+    });
+</script>
+
+</body>
+</html>
+

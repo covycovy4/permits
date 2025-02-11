@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ district_name }} Page</title>
+</head>
+<body>
+    <h1>{{ district_name }} District Permit Management</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Permit ID</th>
+                <th>Name</th>
+                <th>Origin District</th>
+                <th>Destination District</th>
+                <th>Origin Status</th>
+                <th>Destination Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for permit in permits %}
+            <tr>
+                <td>{{ permit.id }}</td>
+                <td>{{ permit.name }}</td>
+                <td>{{ permit.origin_district }}: {{ permit.origin_status }}</td>
+                <td>{{ permit.destination_district }}: {{ permit.destination_status }}</td>
+                <td>
+                <form action="/approve/origin/{{ permit.id }}" method="POST">
+    <button type="submit">Approve Origin</button>
+</form>
+<form action="/disapprove/origin/{{ permit.id }}" method="POST">
+    <button type="submit">Disapprove Origin</button>
+</form>
+
+<form action="/approve/destination/{{ permit.id }}" method="POST">
+    <button type="submit">Approve Destination</button>
+</form>
+<form action="/disapprove/destination/{{ permit.id }}" method="POST">
+    <button type="submit">Disapprove Destination</button>
+</form>
+
+                    {% if permit.origin_district == district_name %}
+                        {% if permit.origin_status == "Pending" %}
+                            <form action="/approve_origin/{{ permit.id }}" method="POST">
+                                <button type="submit">Approve Origin</button>
+                            </form>
+                            <form action="/disapprove_origin/{{ permit.id }}" method="POST">
+                                <button type="submit">Disapprove Origin</button>
+                            </form>
+                        {% else %}
+                            {{ permit.origin_status }}
+                        {% endif %}
+                    {% else %}
+                        {{ permit.origin_status }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if permit.destination_district == district_name %}
+                        {% if permit.destination_status == "Pending" %}
+                            <form action="/approve_destination/{{ permit.id }}" method="POST">
+                                <button type="submit">Approve Destination</button>
+                            </form>
+                            <form action="/disapprove_destination/{{ permit.id }}" method="POST">
+                                <button type="submit">Disapprove Destination</button>
+                            </form>
+                        {% else %}
+                            {{ permit.destination_status }}
+                        {% endif %}
+                    {% else %}
+                        {{ permit.destination_status }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if permit.origin_status == "Approved" and permit.destination_status == "Approved" %}
+                        <span style="color: green;">Fully Approved</span>
+                    {% else %}
+                        <span style="color: red;">Not Fully Approved</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+

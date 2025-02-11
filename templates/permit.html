@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movement of Animals Permit</title>
+    <style>
+        /* General styling for body and container */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1, header h2, header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        form fieldset {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+
+        form legend {
+            font-weight: bold;
+            padding: 0 10px;
+        }
+
+        form .form-section {
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>Department of Veterinary Services</h1>
+            <h2>Animal Health Regulations 1984</h2>
+            <h3>Movement of Animal Permit</h3>
+            <hr>
+        </div>
+
+        <!-- Form Section -->
+        <form id="movementPermitForm" novalidate>
+            <!-- Personal Information -->
+            <fieldset>
+                <legend>Personal Information</legend>
+                <div class="form-section">
+                    <label for="salutation">Title:</label>
+                    <select id="salutation" name="salutation" required>
+                        <option value="">--Select--</option>
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Miss">Miss</option>
+                    </select>
+                </div>
+                <div class="form-section">
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-section">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" placeholder="Enter your address" required>
+                </div>
+            </fieldset>
+
+            <!-- Animal Information -->
+            <fieldset>
+                <legend>Animal Information</legend>
+                <div class="form-section">
+                    <label for="numberOfAnimals">Number of Animals:</label>
+                    <input type="number" id="numberOfAnimals" name="numberOfAnimals" placeholder="Enter a number" min="1" required>
+                </div>
+                <div class="form-section">
+                    <label for="animalType">Animal Type:</label>
+                    <select id="animalType" name="animalType" required>
+                        <option value="">--Select Animal Type--</option>
+                        <option value="cattle">Cattle</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-section" id="cattleOptions" style="display:none;">
+                    <label for="cattleType">Cattle Type:</label>
+                    <select id="cattleType" name="cattleType">
+                        <option value="">--Select Cattle Type--</option>
+                        <option value="bull">Bull</option>
+                        <option value="calf">Calf</option>
+                        <option value="cow">Cow</option>
+                        <option value="oxen">Oxen</option>
+                        <option value="steer">Steer</option>
+                    </select>
+                </div>
+                <div class="form-section" id="otherAnimal" style="display:none;">
+                    <label for="otherAnimalType">Other Animal:</label>
+                    <input type="text" id="otherAnimalType" name="otherAnimalType" placeholder="Enter animal type">
+                </div>
+            </fieldset>
+
+            <!-- Movement Details -->
+            <fieldset>
+                <legend>Movement Details</legend>
+                <div class="form-section">
+                    <label for="origin">Place of Origin:</label>
+                    <input type="text" id="origin" name="origin" placeholder="Enter origin" required>
+                </div>
+                <!-- Origin District -->
+                <div class="form-section">
+                    <label for="originDistrict">Origin District:</label>
+                    <select id="originDistrict" name="originDistrict" required>
+                        <option value="">--Select District--</option>
+                        <option value="Mutare">Mutare</option>
+                        <option value="Mutasa">Mutasa</option>
+                        <option value="Nyanga">Nyanga</option>
+                        <option value="Makoni">Makoni</option>
+                        <option value="Chimanimani">Chimanimani</option>
+                        <option value="Buhera">Buhera</option>
+                        <option value="Chipinge">Chipinge</option>
+                    </select>
+                </div>
+                <div class="form-section">
+                    <label for="destination">Destination:</label>
+                    <input type="text" id="destination" name="destination" placeholder="Enter destination" required>
+                </div>
+                <!-- Destination District -->
+                <div class="form-section">
+                    <label for="destinationDistrict">Destination District:</label>
+                    <select id="destinationDistrict" name="destinationDistrict" required>
+                        <option value="">--Select District--</option>
+                        <option value="Mutare">Mutare</option>
+                        <option value="Mutasa">Mutasa</option>
+                        <option value="Nyanga">Nyanga</option>
+                        <option value="Makoni">Makoni</option>
+                        <option value="Chimanimani">Chimanimani</option>
+                        <option value="Buhera">Buhera</option>
+                        <option value="Chipinge">Chipinge</option>
+                    </select>
+                </div>
+                <div class="form-section">
+                    <label for="movementPeriod">Period of Allowed Movement (days):</label>
+                    <input type="number" id="movementPeriod" name="movementPeriod" placeholder="Enter days" min="1" required>
+                </div>
+                <div class="form-section">
+                    <label for="route">Route and Method of Movement:</label>
+                    <input type="text" id="route" name="route" placeholder="Enter route" required>
+                </div>
+            </fieldset>
+
+            <!-- Payment Information -->
+            <fieldset>
+                <legend>Payment Information</legend>
+                <div class="form-section">
+                    <label for="paymentAmount">Amount Paid (USD):</label>
+                    <input type="number" id="paymentAmount" name="paymentAmount" placeholder="Enter amount" min="1" required>
+                </div>
+                <div class="form-section">
+                    <label for="paymentAmountInWords">Amount Paid (In Words):</label>
+                    <input type="text" id="paymentAmountInWords" name="paymentAmountInWords" placeholder="Enter amount in words" pattern="^[a-zA-Z\s]+$" required>
+                </div>
+            </fieldset>
+
+            <!-- Submission Information -->
+            <fieldset>
+                <legend>Submission Information</legend>
+                <div class="form-section">
+                    <label for="submissionDate">Date of Submission:</label>
+                    <input type="date" id="submissionDate" name="submissionDate" required>
+                </div>
+            </fieldset>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Submit Permit</button>
+        </form>
+    </div>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const animalTypeSelect = document.getElementById('animal_type');
+        const cattleOptions = document.getElementById('cattle_options');
+        const otherAnimalInput = document.getElementById('other_animal_type');
+
+        // Toggle visibility for cattle/other animal fields
+        animalTypeSelect.addEventListener('change', () => {
+            const animalType = animalTypeSelect.value;
+            cattleOptions.style.display = animalType === 'cattle' ? 'block' : 'none';
+            otherAnimalInput.style.display = animalType === 'other' ? 'block' : 'none';
+        });
+
+        // Pre-fill form with session storage or query parameters
+        const prefillData = sessionStorage.getItem('permitData');
+        if (prefillData) {
+            const permit = JSON.parse(prefillData);
+            Object.entries(permit).forEach(([key, value]) => {
+                const input = document.getElementById(key);
+                if (input) {
+                    input.value = value;
+                }
+            });
+            sessionStorage.removeItem('permitData');
+        }
+    });
+
+    // Form submission logic
+    document.getElementById('movementPermitForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        // Collect form data
+        const formData = {
+    salutation: document.getElementById('salutation').value,
+    name: document.getElementById('name').value,
+    address: document.getElementById('address').value,
+    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
+    animal_type: document.getElementById('animalType').value,
+    cattle_type: document.getElementById('cattleType')?.value || '',
+    other_animal_type: document.getElementById('otherAnimalType')?.value || '',
+    origin: document.getElementById('origin').value,
+    origin_district: document.getElementById('originDistrict').value,
+    destination: document.getElementById('destination').value,
+    destination_district: document.getElementById('destinationDistrict').value,
+    movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,
+    route: document.getElementById('route').value,
+    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
+    payment_amount_in_words: document.getElementById('paymentAmountInWords').value,
+    submission_date: document.getElementById('submissionDate').value
+};
+
+        // Basic validation
+        if (!formData.name || formData.number_of_animals <= 0) {
+            alert('Please enter a valid name and number of animals.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/permits', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Permit submitted successfully!');
+                window.location.href = '/success'; // Redirect to success page if needed
+            } else {
+                alert(data.error || 'Failed to submit permit!');
+            }
+        } catch (error) {
+            console.error('Error submitting permit:', error);
+            alert('An error occurred while submitting the permit.');
+        }
+    });
+</script>
+

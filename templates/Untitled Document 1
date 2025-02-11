@@ -1,0 +1,28 @@
+templates/
+│
+├── dashboard.html
+│
+├── VEO/
+│   ├── create_no_objection.html
+│   ├── view_no_objections.html
+│   ├── create_permit.html
+│   └── view_permits.html
+│
+├── DVO/
+│   ├── view_no_objections_mutare.html
+│   ├── view_no_objections_mutasa.html
+│   ├── view_no_objections_nyanga.html
+│   ├── view_no_objections_makoni.html
+│   ├── view_no_objections_chimanimani.html
+│   ├── view_no_objections_buhera.html
+│   ├── view_no_objections_chipinge.html
+│   ├── view_permits_mutare.html
+│   ├── view_permits_mutasa.html
+│   ├── view_permits_nyanga.html
+│   ├── view_permits_makoni.html
+│   ├── view_permits_chimanimani.html
+│   ├── view_permits_buhera.html
+│   └── view_permits_chipinge.html
+
+pg_dump -U permit_user -d permit_db --schema-only > schema.sql
+
