@@ -125,12 +125,13 @@
             <h1>Chipinge District Permit Submissions</h1>
             <a href="{{ url_for('main.submissions_page') }}" class="submit-btn">Back to All Submissions</a>
         </div>
-        
+        <a href="{{ url_for('main.form_page') }}" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Submit a Permit</a>
+
         <!-- Permit Submissions Table -->
         <table id="permitTable">
             <thead>
                 <tr>
-                   <th>Date</th>
+                    <th>Date</th>
                     <th>Name</th>
                     <th>Origin District</th>
                     <th>Destination District</th>
@@ -162,33 +163,50 @@
     // Fetch and display submissions
     async function fetchChipingeSubmissions() {
         try {
-            const response = await fetch('/api/chipinge_submissions');
+            const response = await fetch('/api/chipinge_submissions'); 
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
             const permits = await response.json();
+            console.log("Fetched permits:", permits); // Debugging log
 
             const tableBody = document.getElementById('permitTable').querySelector('tbody');
             tableBody.innerHTML = ''; // Clear existing table rows
 
+            const userRole = localStorage.getItem("userRole"); // Retrieve user role from storage
+
             permits.forEach(permit => {
                 const row = document.createElement('tr');
                 row.dataset.id = permit.id;
+
+                let actionButtons = "";
+                if (userRole === "district") {
+                    actionButtons = `
+                        <button class="approve-btn" onclick="approvePermit(${permit.id})">Approve</button>
+                        <button class="disapprove-btn" onclick="showDisapprovalPopup(${permit.id})">Disapprove</button>
+                    `;
+                } else if (userRole === "veo") {
+                    actionButtons = `<button class="disabled-btn" disabled>Not authorized</button>`;
+                }
+
                 row.innerHTML = `
-                     <td>${permit.date}</td>
+                    <td>${permit.date}</td>
                     <td>${permit.name}</td>
                     <td>${permit.origin_district}</td>
                     <td>${permit.destination_district}</td>
                     <td>${permit.number_of_animals}</td>
                     <td>${permit.payment_amount}</td>
                     <td id="permit-status-${permit.id}">${permit.status || 'Pending'}</td>
-                    <td>
-                        <button class="approve-btn" onclick="approvePermit(${permit.id})">Approve</button>
-                        <button class="disapprove-btn" onclick="showDisapprovalPopup(${permit.id})">Disapprove</button>
-                    </td>
+                    <td>${actionButtons}</td>
                 `;
                 tableBody.appendChild(row);
             });
+
         } catch (error) {
             console.error('Error fetching submissions:', error);
-            alert('Failed to fetch submissions.');
+            alert(`Failed to fetch submissions: ${error.message}`);
         }
     }
 
@@ -212,16 +230,14 @@
         if (reason.trim()) {
             fetch(`/permit/${disapprovalId}/disapprove`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason }),
             })
             .then(response => response.json())
             .then(data => {
                 alert('Permit disapproved successfully!');
                 document.getElementById(`permit-status-${disapprovalId}`).innerText = 'Disapproved';
-                closePopup();  // Close the popup after submission
+                closePopup();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -236,21 +252,22 @@
     function approvePermit(permitId) {
         fetch(`/permit/${permitId}/approve`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
         })
         .then(response => response.json())
         .then(data => {
             alert('Permit approved successfully!');
             document.getElementById(`permit-status-${permitId}`).innerText = 'Approved';
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error approving permit:', error);
+            alert('Error approving permit.');
+        });
     }
 
-    // Initialize the page
-    fetchChipingeSubmissions();
+    // Run fetchChipingeSubmissions when page loads
+    document.addEventListener("DOMContentLoaded", fetchChipingeSubmissions);
 </script>
-</body>
+
 </html>
 
