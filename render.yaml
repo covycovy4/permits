@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: my-python-app
+    runtime: python
+    pythonVersion: 3.8
