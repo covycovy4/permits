@@ -1,5 +1,13 @@
 services:
   - type: web
-    name: my-python-app
-    runtime: python
+    name: permits
     pythonVersion: 3.8
+
+    buildCommand: |
+      pip install --upgrade pip setuptools wheel
+      apt-get update && apt-get install -y python3-dev build-essential libssl-dev libffi-dev
+      pip install --upgrade Cython
+      pip install -r requirements.txt
+    startCommand: gunicorn main:app
+
+
