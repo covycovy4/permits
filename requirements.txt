@@ -49,6 +49,8 @@ paramiko==2.7.2
 pexpect==4.8.0
 Pillow==8.4.0
 protobuf==3.19.6
+psycopg2==2.9.10
+psycopg2-binary==2.9.10
 ptyprocess==0.7.0
 pycparser==2.22
 PyJWT==2.3.0
