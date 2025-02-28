@@ -1,10 +1,7 @@
+import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-# Drop existing tables
-
-
-
 
 # Initialize the extensions
 db = SQLAlchemy()
@@ -12,10 +9,10 @@ migrate = Migrate()
 
 def create_app():
     app = Flask(__name__, template_folder='/home/tsidzo/Desktop/Backendprac/veterinary/templates')
-    app.secret_key = "permit123"  # Required for using session
+    app.secret_key = os.getenv("SECRET_KEY", "permit123")  # Fallback if not set
 
-    # App config
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://permit_user:permit123@localhost:5432/permit_db'
+    # Database URI from environment variable
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 
