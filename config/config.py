@@ -7,6 +7,9 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') 
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') 
     MAIL_USE_TLS = True 
+    SQLALCHEMY_DATABASE_URI = database_url or "sqlite:///default.db"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -19,3 +22,9 @@ config = {
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }
+
+
+# Fix DATABASE_URL for SQLAlchemy
+database_url = os.getenv("DATABASE_URL", "").replace("postgres://", "postgresql://")
+
+
