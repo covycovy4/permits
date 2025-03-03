@@ -67,7 +67,7 @@ requests==2.26.0
 simple-websocket==0.3.0
 six==1.16.0
 sqlacodegen==2.3.0.post1
-SQLAlchemy==1.4.54
+SQLAlchemy==2.0.38
 sqlparse==0.4.2
 typing_extensions==4.12.2
 urllib3==1.26.7
