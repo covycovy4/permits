@@ -9,9 +9,11 @@ class Config:
     MAIL_USE_TLS = True 
 
     # Define database_url first
-    database_url = os.getenv("DATABASE_URL", "").replace("postgres://", "postgresql://")
-    SQLALCHEMY_DATABASE_URI = database_url or "sqlite:///default.db"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    database_url = os.getenv("DATABASE_URL", "")
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+SQLALCHEMY_DATABASE_URI = database_url or "sqlite:///default.db"
 
 class DevelopmentConfig(Config):
     DEBUG = True
