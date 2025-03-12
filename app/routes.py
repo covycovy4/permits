@@ -8,7 +8,9 @@ import psycopg2
 import logging
 
 # Create the blueprint after importing
-main = Blueprint('main', __name__)
+# Create the Blueprint with an explicit template folder path
+main = Blueprint('main', __name__, template_folder=os.path.join(os.getcwd(), 'templates'))
+
 
 # Route for the home page
 @main.route('/')
