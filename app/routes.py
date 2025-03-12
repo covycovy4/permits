@@ -4,6 +4,7 @@ from app.models import Permit  # Adjust this if Permit is defined elsewhere
 from datetime import datetime
 from flask_login import current_user
 from flask import session
+import os
 import psycopg2
 import logging
 
