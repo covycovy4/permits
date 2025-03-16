@@ -240,23 +240,24 @@
 
         // Collect form data
         const formData = {
-            salutation: document.getElementById('salutation').value,
-            name: document.getElementById('name').value,
-            address: document.getElementById('address').value,
-            numberOfAnimals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
-            animalType: document.getElementById('animalType').value,
-            cattleType: document.getElementById('cattleType')?.value || '',
-            otherAnimalType: document.getElementById('otherAnimalType')?.value || '',
-            origin: document.getElementById('origin').value,
-            originDistrict: document.getElementById('originDistrict').value,
-            destination: document.getElementById('destination').value,
-            destinationDistrict: document.getElementById('destinationDistrict').value,
-            movementPeriod: parseInt(document.getElementById('movementPeriod').value) || 0,
-            route: document.getElementById('route').value,
-            paymentAmount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
-            paymentAmountInWords: document.getElementById('paymentAmountInWords').value,
-            submissionDate: document.getElementById('submissionDate').value
-        };
+    salutation: document.getElementById('salutation').value,
+    name: document.getElementById('name').value,
+    address: document.getElementById('address').value,
+    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0, // ✅ Matches backend field
+    animal_type: document.getElementById('animalType').value, // ✅ Matches backend field
+    cattle_type: document.getElementById('cattleType')?.value || '', // ✅ Matches backend field
+    other_animal_type: document.getElementById('otherAnimalType')?.value || '', // ✅ Matches backend field
+    origin: document.getElementById('origin').value,
+    origin_district: document.getElementById('originDistrict').value, // ✅ Matches backend field
+    destination: document.getElementById('destination').value,
+    destination_district: document.getElementById('destinationDistrict').value, // ✅ Matches backend field
+    movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,  // ✅ Matches backend field
+    route: document.getElementById('route').value,
+    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,  // ✅ Matches backend field
+    payment_amount_in_words: document.getElementById('paymentAmountInWords').value, // ✅ Matches backend field
+    date: document.getElementById('submissionDate').value // ✅ Matches backend field (renamed from submissionDate)
+};
+
 
         // Basic validation
         if (!formData.name || formData.numberOfAnimals <= 0) {
