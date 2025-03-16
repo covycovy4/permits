@@ -83,6 +83,7 @@
                     <label for="salutation">Title:</label>
                     <select id="salutation" name="salutation" required>
                         <option value="">--Select--</option>
+                        <option value="Dr">Dr</option>
                         <option value="Mr">Mr</option>
                         <option value="Mrs">Mrs</option>
                         <option value="Miss">Miss</option>
@@ -208,15 +209,15 @@
 
    <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const animalTypeSelect = document.getElementById('animal_type');
-        const cattleOptions = document.getElementById('cattle_options');
-        const otherAnimalInput = document.getElementById('other_animal_type');
+        const animalTypeSelect = document.getElementById('animalType');  // ✅ Fixed ID
+        const cattleOptions = document.getElementById('cattleOptions');  // ✅ Fixed ID
+        const otherAnimalInput = document.getElementById('otherAnimal');  // ✅ Fixed ID
 
         // Toggle visibility for cattle/other animal fields
         animalTypeSelect.addEventListener('change', () => {
             const animalType = animalTypeSelect.value;
-            cattleOptions.style.display = animalType === 'cattle' ? 'block' : 'none';
-            otherAnimalInput.style.display = animalType === 'other' ? 'block' : 'none';
+            cattleOptions.style.display = (animalType === 'cattle') ? 'block' : 'none';
+            otherAnimalInput.style.display = (animalType === 'other') ? 'block' : 'none';
         });
 
         // Pre-fill form with session storage or query parameters
@@ -239,24 +240,23 @@
 
         // Collect form data
         const formData = {
-    salutation: document.getElementById('salutation').value,
-    name: document.getElementById('name').value,
-    address: document.getElementById('address').value,
-    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,  // Fix casing
-    animal_type: document.getElementById('animalType').value,  // Fix casing
-    cattle_type: document.getElementById('cattleType')?.value || '',
-    other_animal_type: document.getElementById('otherAnimalType')?.value || '',
-    origin: document.getElementById('origin').value,
-    origin_district: document.getElementById('originDistrict').value,
-    destination: document.getElementById('destination').value,
-    destination_district: document.getElementById('destinationDistrict').value,
-    movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,
-    route: document.getElementById('route').value,
-    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,  // Fix casing
-    payment_amount_in_words: document.getElementById('paymentAmountInWords').value,
-    submission_date: document.getElementById('submissionDate').value
-};
-
+            salutation: document.getElementById('salutation').value,
+            name: document.getElementById('name').value,
+            address: document.getElementById('address').value,
+            number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
+            animal_type: document.getElementById('animalType').value,  // ✅ Fixed ID
+            cattle_type: document.getElementById('cattleType')?.value || '',
+            other_animal_type: document.getElementById('otherAnimalType')?.value || '',
+            origin: document.getElementById('origin').value,
+            origin_district: document.getElementById('originDistrict').value,
+            destination: document.getElementById('destination').value,
+            destination_district: document.getElementById('destinationDistrict').value,
+            movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,  // ✅ Fixed missing field
+            route: document.getElementById('route').value,
+            payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
+            payment_amount_in_words: document.getElementById('paymentAmountInWords').value,
+            submission_date: document.getElementById('submissionDate').value
+        };
 
         // Basic validation
         if (!formData.name || formData.number_of_animals <= 0) {
@@ -264,8 +264,13 @@
             return;
         }
 
+        if (!formData.movement_period || formData.movement_period <= 0) {
+            alert('Please enter a valid movement period.');
+            return;
+        }
+
         try {
-           const response = await fetch('/api/submissions', {
+            const response = await fetch('/api/permits', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -287,4 +292,5 @@
         }
     });
 </script>
+
 
