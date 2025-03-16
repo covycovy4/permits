@@ -19,13 +19,15 @@ def index():
     return render_template('index.html')
 
 # Database Configuration
-DB_CONFIG = {
-    "dbname": "permit_db",
-    "user": "permit_user",
-    "password": "permit123",
-    "host": "localhost",
-    "port": "5432"
-}
+DATABASE_URL = os.getenv("DATABASE_URL")
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+        return conn
+    except Exception as e:
+        print("Database connection error:", e)
+        return None
+
 
 # Function to establish a database connection
 def get_db_connection():
