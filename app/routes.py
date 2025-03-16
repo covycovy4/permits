@@ -92,68 +92,38 @@ def get_submission(id):
 # Route to submit a new permit
 
 @main.route('/submit', methods=['POST'])
-
 def submit_permit():
-
     try:
-
-        # Get data from the request body
-
         data = request.json
-
-        # Create a new Permit record
-
         new_permit = Permit(
-
             salutation=data['salutation'],
-
             name=data['name'],
-
             address=data['address'],
-
             number_of_animals=data['numberOfAnimals'],
-
             animal_type=data['animalType'],
-
             cattle_type=data.get('cattleType', None),
-
             other_animal_type=data.get('otherAnimalType', None),
-
             origin=data['origin'],
-
             origin_district=data['originDistrict'],
-
             destination=data['destination'],
-
             destination_district=data['destinationDistrict'],
-
             movement_period=data['movementPeriod'],
-
             route=data['route'],
-
             payment_amount=data['paymentAmount'],
-
             payment_amount_in_words=data['paymentAmountInWords'],
-
             date=datetime.strptime(data['submissionDate'], '%Y-%m-%d'),
-
             status='Submitted'
-
         )
 
-        # Add the new permit to the session and commit it to the database
-
         db.session.add(new_permit)
-
-        db.session.commit()
+        db.session.commit()  # ✅ Ensure commit
 
         return jsonify({'message': 'Permit successfully submitted!'}), 201
 
     except Exception as e:
-
+        db.session.rollback()  # ✅ Rollback in case of error
+        print("Error submitting permit:", e)
         return jsonify({'error': str(e)}), 400
-
-
 
 
 # Create permit

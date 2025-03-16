@@ -207,11 +207,11 @@
         </form>
     </div>
 
-   <script>
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const animalTypeSelect = document.getElementById('animalType');  // ✅ Fixed ID
-        const cattleOptions = document.getElementById('cattleOptions');  // ✅ Fixed ID
-        const otherAnimalInput = document.getElementById('otherAnimal');  // ✅ Fixed ID
+        const animalTypeSelect = document.getElementById('animalType');
+        const cattleOptions = document.getElementById('cattleOptions');
+        const otherAnimalInput = document.getElementById('otherAnimal');
 
         // Toggle visibility for cattle/other animal fields
         animalTypeSelect.addEventListener('change', () => {
@@ -220,7 +220,7 @@
             otherAnimalInput.style.display = (animalType === 'other') ? 'block' : 'none';
         });
 
-        // Pre-fill form with session storage or query parameters
+        // Pre-fill form with session storage
         const prefillData = sessionStorage.getItem('permitData');
         if (prefillData) {
             const permit = JSON.parse(prefillData);
@@ -243,34 +243,34 @@
             salutation: document.getElementById('salutation').value,
             name: document.getElementById('name').value,
             address: document.getElementById('address').value,
-            number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
-            animal_type: document.getElementById('animalType').value,  // ✅ Fixed ID
-            cattle_type: document.getElementById('cattleType')?.value || '',
-            other_animal_type: document.getElementById('otherAnimalType')?.value || '',
+            numberOfAnimals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
+            animalType: document.getElementById('animalType').value,
+            cattleType: document.getElementById('cattleType')?.value || '',
+            otherAnimalType: document.getElementById('otherAnimalType')?.value || '',
             origin: document.getElementById('origin').value,
-            origin_district: document.getElementById('originDistrict').value,
+            originDistrict: document.getElementById('originDistrict').value,
             destination: document.getElementById('destination').value,
-            destination_district: document.getElementById('destinationDistrict').value,
-            movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,  // ✅ Fixed missing field
+            destinationDistrict: document.getElementById('destinationDistrict').value,
+            movementPeriod: parseInt(document.getElementById('movementPeriod').value) || 0,
             route: document.getElementById('route').value,
-            payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
-            payment_amount_in_words: document.getElementById('paymentAmountInWords').value,
-            submission_date: document.getElementById('submissionDate').value
+            paymentAmount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
+            paymentAmountInWords: document.getElementById('paymentAmountInWords').value,
+            submissionDate: document.getElementById('submissionDate').value
         };
 
         // Basic validation
-        if (!formData.name || formData.number_of_animals <= 0) {
+        if (!formData.name || formData.numberOfAnimals <= 0) {
             alert('Please enter a valid name and number of animals.');
             return;
         }
 
-        if (!formData.movement_period || formData.movement_period <= 0) {
+        if (!formData.movementPeriod || formData.movementPeriod <= 0) {
             alert('Please enter a valid movement period.');
             return;
         }
 
-                try {
-            const response = await fetch('/api/permits', {
+        try {
+            const response = await fetch('/api/submissions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -278,8 +278,8 @@
                 body: JSON.stringify(formData),
             });
 
-            const textResponse = await response.text();  // Read response as text first
-            console.log('Raw server response:', textResponse);  // Debugging step
+            const textResponse = await response.text(); // Read response as text first
+            console.log('Raw server response:', textResponse); // Debugging step
 
             // Try to parse as JSON
             let data;
@@ -301,7 +301,6 @@
             console.error('Error submitting permit:', error);
             alert('An error occurred while submitting the permit.');
         }
-
+    });
 </script>
-
 
