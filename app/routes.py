@@ -17,25 +17,21 @@ main = Blueprint('main', __name__, template_folder=os.path.join(os.getcwd(), 'te
 @main.route('/')
 def index():
     return render_template('index.html')
-
-# Database Configuration
+    
+# Fetch the database URL from Heroku's environment variables
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    print("❌ ERROR: DATABASE_URL is not set in the environment!")
+    exit(1)  # Stop the application if DB connection is missing
+
+# Function to establish a database connection
 def get_db_connection():
     try:
         conn = psycopg2.connect(DATABASE_URL, sslmode="require")
         return conn
     except Exception as e:
-        print("Database connection error:", e)
-        return None
-
-
-# Function to establish a database connection
-def get_db_connection():
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        return conn
-    except Exception as e:
-        print("Database connection error:", e)
+        print(f"Database connection error: {str(e)}")
         return None  # Ensures the caller handles this properly
 @main.route('/api/submissions/<int:id>', methods=['GET'])
 
