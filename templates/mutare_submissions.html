@@ -123,7 +123,7 @@
     <div class="container">
         <div class="header">
             <h1>Mutare District Permit Submissions</h1>
-            <a href="{{ url_for('main.submissions_page') }}" class="submit-btn">Back to All Submissions</a>
+           <a href="{{ url_for('main.submissions_page') }}" class="submit-btn" onclick="promptAdminPassword()">Back to All Submissions</a>
         </div>
        <a href="{{ url_for('main.form_page') }}" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Submit a Permit</a>
 
@@ -156,6 +156,12 @@
         <button onclick="submitDisapproval()">Submit</button>
         <span class="close-popup" onclick="closePopup()">Close</span>
     </div>
+</div>
+      <!-- Overlay and Popup for Permit Details -->
+<div class="overlay" id="detailsOverlay" onclick="closePopup()"></div>
+<div class="popup" id="detailsPopup">
+    <div id="popupContent"></div>
+    <button onclick="closePopup()">Close</button>
 </div>
 
 <script>
@@ -269,6 +275,53 @@
 
     // Run fetchMutareSubmissions when page loads
     document.addEventListener("DOMContentLoaded", fetchMutareSubmissions);
+    
+    function promptAdminPassword() {
+    const password = prompt("Enter admin password:");
+    if (password === "admin123") {
+        window.location.href = "{{ url_for('main.submissions_page') }}";
+    } else {
+        alert("Incorrect password. Access denied.");
+    }
+}
+// Show permit details in a popup
+async function showDetails(id) {
+    try {
+        const response = await fetch(`/api/submissions/${id}`);
+        const permit = await response.json();
+
+        if (response.ok) {
+            const salutation = permit.salutation ? permit.salutation : ''; // Handle null salutation
+            const popupContent = document.getElementById('popupContent');
+            popupContent.innerHTML = `
+                <h3>Permit Summary</h3>
+                <p><strong>Name:</strong> ${salutation} ${permit.name}</p>
+                <p><strong>Number of Animals:</strong> ${permit.number_of_animals}</p>
+                <p><strong>Animal Type:</strong> ${permit.animal_type}</p>
+                <p><strong>Origin:</strong> ${permit.origin_district}</p>
+                <p><strong>Destination:</strong> ${permit.destination_district}</p>
+                <p><strong>Movement Period:</strong> ${permit.movement_period} days</p>
+                <p><strong>Route:</strong> ${permit.route}</p>
+                <p><strong>Amount Paid:</strong> ${permit.payment_amount} USD</p>
+                <p><strong>Amount in Words:</strong> ${permit.payment_amount_in_words}</p>
+            `;
+            document.getElementById('detailsOverlay').style.display = 'block';
+            document.getElementById('detailsPopup').style.display = 'block';
+        } else {
+            alert(permit.error || 'Failed to fetch permit details.');
+        }
+    } catch (error) {
+        console.error('Error fetching permit details:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Close the popup
+function closePopup() {
+    document.getElementById('detailsOverlay').style.display = 'none';
+    document.getElementById('detailsPopup').style.display = 'none';
+}
+
 </script>
 
 </html>
