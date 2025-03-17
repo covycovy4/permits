@@ -116,32 +116,43 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        /* Ensure the overlay covers everything */
-.overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
-
-/* Style the details popup */
-.popup {
+ /* Basic styling for popup and overlay */
+.popup, .overlay {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    width: 400px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 2000;
-    border-radius: 10px;
+    z-index: 1000;
 }
+
+.popup {
+    width: 15cm;
+    height: auto;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.popup h3 {
+    margin-top: 0;
+}
+
+.close-popup {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    cursor: pointer;
+    color: #007BFF;
+}
+
 
     </style>
 </head>
@@ -185,11 +196,15 @@
     </div>
 </div>
       <!-- Overlay and Popup for Permit Details -->
-<div class="overlay" id="detailsOverlay" onclick="closePopup()"></div>
-<div class="popup" id="detailsPopup">
+<!-- Overlay for background dim -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Popup window -->
+<div class="popup" id="popup">
     <div id="popupContent"></div>
-    <button onclick="closePopup()">Close</button>
+    <span class="close-popup" onclick="closePopup()">Close</span>
 </div>
+
 <script>
     let disapprovalId = null;
 
@@ -225,19 +240,16 @@
                 }
 
                 row.innerHTML = `
-    <td>${permit.date}</td>
-    <td>${permit.id}</td>
-    <td onclick="showDetails(${permit.id})" style="cursor: pointer; color: blue; text-decoration: underline;">
-        ${permit.name}
-    </td>
-    <td>${permit.origin_district}</td>
-    <td>${permit.destination_district}</td>
-    <td>${permit.number_of_animals}</td>
-    <td>${permit.payment_amount}</td>
-    <td id="permit-status-${permit.id}">${permit.status || 'Pending'}</td>
-    <td>${actionButtons}</td>
-`;
-
+                    <td>${permit.date}</td>
+                    <td>${permit.id}</td>
+                    <td><a href="#" onclick="showDetails(${permit.id})">${permit.name}</a></td>
+                    <td>${permit.origin_district}</td>
+                    <td>${permit.destination_district}</td>
+                    <td>${permit.number_of_animals}</td>
+                    <td>${permit.payment_amount}</td>
+                    <td id="permit-status-${permit.id}">${permit.status || 'Pending'}</td>
+                    <td>${actionButtons}</td>
+                `;
                 tableBody.appendChild(row);
             });
 
@@ -285,61 +297,6 @@
         }
     }
 
-async function showDetails(id) {
-    try {
-        const response = await fetch(`/api/submissions/${id}`);
-        const permit = await response.json();
-
-        if (response.ok) {
-            // Make sure we have a valid permit object
-            if (!permit || Object.keys(permit).length === 0) {
-                alert("No details available for this permit.");
-                return;
-            }
-
-            // Handle missing fields gracefully
-            const salutation = permit.salutation ? permit.salutation : ''; 
-
-            const popupContent = document.getElementById('popupContent');
-            popupContent.innerHTML = `
-                <h3>Permit Summary</h3>
-                <p><strong>Name:</strong> ${salutation} ${permit.name}</p>
-                <p><strong>Number of Animals:</strong> ${permit.number_of_animals || 'N/A'}</p>
-                <p><strong>Animal Type:</strong> ${permit.animal_type || 'N/A'}</p>
-                <p><strong>Origin:</strong> ${permit.origin_district || 'N/A'}</p>
-                <p><strong>Destination:</strong> ${permit.destination_district || 'N/A'}</p>
-                <p><strong>Movement Period:</strong> ${permit.movement_period || 'N/A'} days</p>
-                <p><strong>Route:</strong> ${permit.route || 'N/A'}</p>
-                <p><strong>Amount Paid:</strong> ${permit.payment_amount || 'N/A'} USD</p>
-                <p><strong>Amount in Words:</strong> ${permit.payment_amount_in_words || 'N/A'}</p>
-            `;
-
-            // Show the popup
-            document.getElementById('detailsOverlay').style.display = 'block';
-            document.getElementById('detailsPopup').style.display = 'block';
-
-        } else {
-            alert("Failed to fetch permit details.");
-        }
-    } catch (error) {
-        console.error("Error fetching permit details:", error);
-        alert("An error occurred. Please try again.");
-    }
-}
-function closePopup() {
-    document.getElementById('detailsOverlay').style.display = 'none';
-    document.getElementById('detailsPopup').style.display = 'none';
-}
-function showDetails(id) {
-    console.log("Clicked name with ID:", id);
-}
-async function showDetails(id) {
-    console.log("Fetching details for ID:", id);
-    const response = await fetch(`/api/submissions/${id}`);
-    console.log("Response:", response);
-}
-
-
     // Approve permit
     function approvePermit(permitId) {
         fetch(`/permit/${permitId}/approve`, {
@@ -359,7 +316,47 @@ async function showDetails(id) {
 
     // Run fetchMutareSubmissions when page loads
     document.addEventListener("DOMContentLoaded", fetchMutareSubmissions);
+    
+    // Function to show the popup with details
+async function showDetails(id) {
+    try {
+        const response = await fetch(`/api/submissions/${id}`);
+        const permit = await response.json();
+
+        if (response.ok) {
+            const salutation = permit.salutation ? permit.salutation : ''; // Handle null salutation
+            const popupContent = document.getElementById('popupContent');
+            popupContent.innerHTML = `
+                <h3>Permit Summary</h3>
+                <p><strong>Name:</strong> ${salutation} ${permit.name}</p>
+                <p><strong>Number of Animals:</strong> ${permit.number_of_animals}</p>
+                <p><strong>Animal Type:</strong> ${permit.animal_type}</p>
+                <p><strong>Origin:</strong> ${permit.origin_district}</p>
+                <p><strong>Destination:</strong> ${permit.destination_district}</p>
+                <p><strong>Movement Period:</strong> ${permit.movement_period} days</p>
+                <p><strong>Route:</strong> ${permit.route}</p>
+                <p><strong>Amount Paid:</strong> ${permit.payment_amount} USD</p>
+                <p><strong>Amount in Words:</strong> ${permit.payment_amount_in_words}</p>
+            `;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup').style.display = 'block';
+        } else {
+            alert(permit.error || 'Failed to fetch permit details.');
+        }
+    } catch (error) {
+        console.error('Error fetching permit details:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Function to close the popup
+function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('popup').style.display = 'none';
+}
+
 </script>
+
 
 
 </html>
