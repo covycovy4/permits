@@ -696,13 +696,13 @@ def get_mutasa_submissions():
         return jsonify({'error': f"An error occurred while fetching Mutasa submissions: {str(e)}"}), 500
 
 
-# API to fetch Makoni-specific submissions
-@main.route('/api/makoni_submissions', methods=['GET'])
+# API to fetch Mutare-specific submissions
+@main.route('/api/mutare_submissions', methods=['GET'])
 def get_mutare_submissions():
     try:
         permits = Permit.query.filter(
-            (Permit.origin_district.ilike('%Makoni%')) |
-            (Permit.destination_district.ilike('%Makoni%'))
+            (Permit.origin_district.ilike('%Mutare%')) |
+            (Permit.destination_district.ilike('%Mutare%'))
         ).all()
 
         results = [{
@@ -729,7 +729,7 @@ def get_mutare_submissions():
         return jsonify(results)
 
     except Exception as e:
-        return jsonify({'error': f"An error occurred while fetching Makoni submissions: {str(e)}"}), 500
+        return jsonify({'error': f"An error occurred while fetching Mutare submissions: {str(e)}"}), 500
 
 
 # API to fetch Nyanga-specific submissions
