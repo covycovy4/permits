@@ -220,7 +220,7 @@
             otherAnimalInput.style.display = (animalType === 'other') ? 'block' : 'none';
         });
 
-        // Pre-fill form with session storage
+        // Pre-fill form with session storage (if any)
         const prefillData = sessionStorage.getItem('permitData');
         if (prefillData) {
             const permit = JSON.parse(prefillData);
@@ -230,45 +230,44 @@
                     input.value = value;
                 }
             });
-            sessionStorage.removeItem('permitData');
+            sessionStorage.removeItem('permitData'); // Remove stored data after prefill
         }
     });
 
     // Form submission logic
     document.getElementById('movementPermitForm').addEventListener('submit', async function (event) {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default form submission
 
         // Collect form data
-       const formData = {
-    salutation: document.getElementById('salutation').value,
-    name: document.getElementById('name').value,
-    address: document.getElementById('address').value,
-    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
-    animal_type: document.getElementById('animalType').value,
-    cattle_type: document.getElementById('cattleType')?.value || '',
-    other_animal_type: document.getElementById('otherAnimalType')?.value || '',
-    origin: document.getElementById('origin').value,
-    origin_district: document.getElementById('originDistrict').value,
-    destination: document.getElementById('destination').value,
-    destination_district: document.getElementById('destinationDistrict').value,
-    movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,
-    route: document.getElementById('route').value,
-    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
-    payment_amount_in_words: document.getElementById('paymentAmountInWords').value,
-    submission_date: document.getElementById('submissionDate').value
-};
-
+        const formData = {
+            salutation: document.getElementById('salutation').value,
+            name: document.getElementById('name').value,
+            address: document.getElementById('address').value,
+            number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
+            animal_type: document.getElementById('animalType').value,
+            cattle_type: document.getElementById('cattleType')?.value || '',
+            other_animal_type: document.getElementById('otherAnimalType')?.value || '',
+            origin: document.getElementById('origin').value,
+            origin_district: document.getElementById('originDistrict').value,
+            destination: document.getElementById('destination').value,
+            destination_district: document.getElementById('destinationDistrict').value,
+            movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,
+            route: document.getElementById('route').value,
+            payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
+            payment_amount_in_words: document.getElementById('paymentAmountInWords').value,
+            submission_date: document.getElementById('submissionDate').value
+        };
 
         // Basic validation
-        if (!formData.name || formData.numberOfAnimals <= 0) {
+        if (!formData.name || formData.number_of_animals <= 0) {
             alert('Please enter a valid name and number of animals.');
             return;
         }
 
         if (!formData.movement_period || isNaN(formData.movement_period) || parseInt(formData.movement_period) <= 0) {
-    alert('Please enter a valid movement period.');
-    return;
-    }
+            alert('Please enter a valid movement period.');
+            return;
+        }
 
         try {
             const response = await fetch('/api/submissions', {
@@ -294,7 +293,14 @@
 
             if (response.ok) {
                 alert('Permit submitted successfully!');
-                window.location.href = '/success'; // Redirect to success page if needed
+
+                // **Clear the form fields**
+                this.reset();
+
+                // **Optional: Clear dynamic fields visibility**
+                document.getElementById('cattleOptions').style.display = 'none';
+                document.getElementById('otherAnimal').style.display = 'none';
+
             } else {
                 alert(data.error || 'Failed to submit permit!');
             }
@@ -304,4 +310,5 @@
         }
     });
 </script>
+
 
