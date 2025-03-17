@@ -251,7 +251,7 @@
     origin_district: document.getElementById('originDistrict').value,  
     destination: document.getElementById('destination').value,
     destination_district: document.getElementById('destinationDistrict').value,  
-    movement_period: document.getElementById('movementPeriod').value,  
+    movement_period: document.getElementById('movementPeriod').value.trim(),
     route: document.getElementById('route').value,
     payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,  
     payment_amount_in_words: document.getElementById('paymentAmountInWords').value,  
@@ -265,10 +265,10 @@
             return;
         }
 
-        if (!formData.movementPeriod || formData.movementPeriod <= 0) {
-            alert('Please enter a valid movement period.');
-            return;
-        }
+        if (!formData.movement_period || isNaN(formData.movement_period) || parseInt(formData.movement_period) <= 0) {
+    alert('Please enter a valid movement period.');
+    return;
+    }
 
         try {
             const response = await fetch('/api/submissions', {
