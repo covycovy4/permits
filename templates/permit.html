@@ -239,23 +239,23 @@
         event.preventDefault();
 
         // Collect form data
-        const formData = {
+       const formData = {
     salutation: document.getElementById('salutation').value,
     name: document.getElementById('name').value,
     address: document.getElementById('address').value,
-    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,  
-    animal_type: document.getElementById('animalType').value,  
-    cattle_type: document.getElementById('cattleType')?.value || '',  
-    other_animal_type: document.getElementById('otherAnimalType')?.value || '',  
+    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,
+    animal_type: document.getElementById('animalType').value,
+    cattle_type: document.getElementById('cattleType')?.value || '',
+    other_animal_type: document.getElementById('otherAnimalType')?.value || '',
     origin: document.getElementById('origin').value,
-    origin_district: document.getElementById('originDistrict').value,  
+    origin_district: document.getElementById('originDistrict').value,
     destination: document.getElementById('destination').value,
-    destination_district: document.getElementById('destinationDistrict').value,  
-    movement_period: document.getElementById('movementPeriod').value.trim(),
+    destination_district: document.getElementById('destinationDistrict').value,
+    movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,
     route: document.getElementById('route').value,
-    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,  
-    payment_amount_in_words: document.getElementById('paymentAmountInWords').value,  
-    date: document.getElementById('submissionDate').value  
+    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,
+    payment_amount_in_words: document.getElementById('paymentAmountInWords').value,
+    submission_date: document.getElementById('submissionDate').value
 };
 
 

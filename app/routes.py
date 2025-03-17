@@ -37,7 +37,6 @@ def get_db_connection():
     except Exception as e:
         print("Database connection error:", e)
         return None  # Ensures the caller handles this properly
-        
 @main.route('/api/submissions/<int:id>', methods=['GET'])
 
 def get_submission(id):
@@ -88,41 +87,72 @@ def get_submission(id):
 
     return jsonify({'error': 'Permit not found'}), 404
 
-@main.route('/submit', methods=['POST'])
-def submit_permit():
-    try:
-        data = request.json  # ✅ Extract JSON payload
 
-        # ✅ Ensure database field names match frontend formData
+# Route to submit a new permit
+
+@main.route('/submit', methods=['POST'])
+
+def submit_permit():
+
+    try:
+
+        # Get data from the request body
+
+        data = request.json
+
+        # Create a new Permit record
+
         new_permit = Permit(
+
             salutation=data['salutation'],
+
             name=data['name'],
+
             address=data['address'],
-            number_of_animals=data['number_of_animals'],  # ✅ Fixed field name
-            animal_type=data['animal_type'],  # ✅ Fixed field name
-            cattle_type=data.get('cattle_type', None),  # ✅ Fixed field name
-            other_animal_type=data.get('other_animal_type', None),  # ✅ Fixed field name
+
+            number_of_animals=data['numberOfAnimals'],
+
+            animal_type=data['animalType'],
+
+            cattle_type=data.get('cattleType', None),
+
+            other_animal_type=data.get('otherAnimalType', None),
+
             origin=data['origin'],
-            origin_district=data['origin_district'],  # ✅ Fixed field name
+
+            origin_district=data['originDistrict'],
+
             destination=data['destination'],
-            destination_district=data['destination_district'],  # ✅ Fixed field name
-            movement_period=data['movement_period'],  # ✅ Fixed field name
+
+            destination_district=data['destinationDistrict'],
+
+            movement_period=data['movementPeriod'],
+
             route=data['route'],
-            payment_amount=data['payment_amount'],  # ✅ Fixed field name
-            payment_amount_in_words=data['payment_amount_in_words'],  # ✅ Fixed field name
-            date=datetime.strptime(data['date'], '%Y-%m-%d'),  # ✅ Fixed field name
-            status='Submitted'  # ✅ Set default status
+
+            payment_amount=data['paymentAmount'],
+
+            payment_amount_in_words=data['paymentAmountInWords'],
+
+            date=datetime.strptime(data['submissionDate'], '%Y-%m-%d'),
+
+            status='Submitted'
+
         )
 
-        db.session.add(new_permit)
-        db.session.commit()  # ✅ Ensure database commit
+        # Add the new permit to the session and commit it to the database
 
-        return jsonify({'message': 'Permit successfully submitted!'}), 201  # ✅ Use 201 for creation
+        db.session.add(new_permit)
+
+        db.session.commit()
+
+        return jsonify({'message': 'Permit successfully submitted!'}), 201
 
     except Exception as e:
-        db.session.rollback()  # ✅ Rollback in case of error
-        print("Error submitting permit:", e)  # ✅ Log error
-        return jsonify({'error': str(e)}), 400  # ✅ Return HTTP 400 for bad request
+
+        return jsonify({'error': str(e)}), 400
+
+
 
 
 # Create permit
@@ -280,9 +310,6 @@ def get_submissions():
     except Exception as e:
 
         return jsonify({'error': f"An error occurred while fetching submissions: {str(e)}"}), 500
-
-
-
 
 # Fetch a single permit by ID
 @main.route('/api/permits/<int:permit_id>', methods=['GET'])
