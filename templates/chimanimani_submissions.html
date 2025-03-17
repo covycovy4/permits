@@ -167,7 +167,7 @@
             const response = await fetch('/api/chimanimani_submissions'); 
             
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error(HTTP error! Status: ${response.status});
             }
 
             const permits = await response.json();
@@ -184,15 +184,15 @@
 
                 let actionButtons = "";
                 if (userRole === "district") {
-                    actionButtons = `
+                    actionButtons = 
                         <button class="approve-btn" onclick="approvePermit(${permit.id})">Approve</button>
                         <button class="disapprove-btn" onclick="showDisapprovalPopup(${permit.id})">Disapprove</button>
-                    `;
+                    ;
                 } else if (userRole === "veo") {
-                    actionButtons = `<button class="disabled-btn" disabled>Not authorized</button>`;
+                    actionButtons = <button class="disabled-btn" disabled>Not authorized</button>;
                 }
 
-                row.innerHTML = `
+                row.innerHTML = 
                     <td>${permit.date}</td>
                     <td>${permit.id}</td>
                     <td>${permit.name}</td>
@@ -202,13 +202,13 @@
                     <td>${permit.payment_amount}</td>
                     <td id="permit-status-${permit.id}">${permit.status || 'Pending'}</td>
                     <td>${actionButtons}</td>
-                `;
+                ;
                 tableBody.appendChild(row);
             });
 
         } catch (error) {
             console.error('Error fetching submissions:', error);
-            alert(`Failed to fetch submissions: ${error.message}`);
+            alert(Failed to fetch submissions: ${error.message});
         }
     }
 
@@ -230,7 +230,7 @@
         const reason = document.getElementById('disapprovalReason').value;
 
         if (reason.trim()) {
-            fetch(`/permit/${disapprovalId}/disapprove`, {
+            fetch(/permit/${disapprovalId}/disapprove, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason }),
@@ -238,7 +238,7 @@
             .then(response => response.json())
             .then(data => {
                 alert('Permit disapproved successfully!');
-                document.getElementById(`permit-status-${disapprovalId}`).innerText = 'Disapproved';
+                document.getElementById(permit-status-${disapprovalId}).innerText = 'Disapproved';
                 closePopup();
             })
             .catch(error => {
@@ -252,14 +252,14 @@
 
     // Approve permit
     function approvePermit(permitId) {
-        fetch(`/permit/${permitId}/approve`, {
+        fetch(/permit/${permitId}/approve, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
         })
         .then(response => response.json())
         .then(data => {
             alert('Permit approved successfully!');
-            document.getElementById(`permit-status-${permitId}`).innerText = 'Approved';
+            document.getElementById(permit-status-${permitId}).innerText = 'Approved';
         })
         .catch(error => {
             console.error('Error approving permit:', error);
@@ -270,6 +270,7 @@
     // Run fetchChimanimaniSubmissions when page loads
     document.addEventListener("DOMContentLoaded", fetchChimanimaniSubmissions);
 </script>
+
 
 </html>
 
