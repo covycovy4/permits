@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en">
 
@@ -264,9 +264,9 @@
             <tr>
 
                 <th onclick="sortTable(0)">Date</th>
-
-                <th onclick="sortTable(1)">ID</th>
                 
+                <th onclick="sortTable(1)">ID</th>
+
                 <th onclick="sortTable(2)">Name</th>
 
                 <th onclick="sortTable(3)">Origin District</th>
@@ -276,6 +276,7 @@
                 <th onclick="sortTable(5)">Number of Animals</th>
 
                 <th onclick="sortTable(6)">Payment Amount</th>
+
 
                 <th>Actions</th>
 
@@ -309,63 +310,35 @@
 
         // Fetch and display submissions on page load
 
-        async function fetchSubmissions() {
-
+         async function fetchSubmissions() {
             try {
-
                 const response = await fetch('/api/submissions');
-
                 const permits = await response.json();
-
-
                 const tableBody = document.getElementById('permitTable').querySelector('tbody');
-
                 permits.forEach(permit => {
-
                     const row = document.createElement('tr');
-
-                    row.dataset.id = permit.id; // Set data-id for each row
-
-                    row.innerHTML = 
-
+                    row.dataset.id = permit.id;
+                    row.innerHTML = `
                         <td>${permit.date}</td>
-
+                        <td>${permit.id}</td>
                         <td><a href="#" onclick="showDetails(${permit.id})">${permit.name}</a></td>
-
                         <td>${permit.origin_district}</td>
-
                         <td>${permit.destination_district}</td>
-
                         <td>${permit.number_of_animals}</td>
-
                         <td>${permit.payment_amount}</td>
-
-                        <td>${permit.status}</td>
-
                         <td>
-
                             <button onclick="editPermit(${permit.id})">Edit</button>
-
                             <button onclick="deletePermit(${permit.id})">Delete</button>
-
                         </td>
-
-                    ;
-
+                    `;
                     tableBody.appendChild(row);
-
                 });
-
             } catch (error) {
-
                 console.error('Error fetching submissions:', error);
-
                 alert('Failed to fetch submissions. Please try again later.');
-
             }
-
         }
-
+        
 
         // Show permit details in a popup
 
@@ -576,8 +549,6 @@
                             row.innerHTML = 
 
                                 <td>${permit.date}</td>
-                                
-                                <td>${permit.id}</td>
 
                                 <td><a href="#" onclick="showDetails(${permit.id})">${permit.name}</a></td>
 
@@ -589,6 +560,7 @@
 
                                 <td>${permit.payment_amount}</td>
 
+                                <td>${permit.status}</td>
 
                                 <td>
 
