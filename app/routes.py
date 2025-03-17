@@ -696,13 +696,13 @@ def get_mutasa_submissions():
         return jsonify({'error': f"An error occurred while fetching Mutasa submissions: {str(e)}"}), 500
 
 
-# API to fetch Mutare-specific submissions
-@main.route('/api/mutare_submissions', methods=['GET'])
+# API to fetch Makoni-specific submissions
+@main.route('/api/makoni_submissions', methods=['GET'])
 def get_mutare_submissions():
     try:
         permits = Permit.query.filter(
-            (Permit.origin_district.ilike('%Mutare%')) |
-            (Permit.destination_district.ilike('%Mutare%'))
+            (Permit.origin_district.ilike('%Makoni%')) |
+            (Permit.destination_district.ilike('%Makoni%'))
         ).all()
 
         results = [{
@@ -729,7 +729,7 @@ def get_mutare_submissions():
         return jsonify(results)
 
     except Exception as e:
-        return jsonify({'error': f"An error occurred while fetching Mutare submissions: {str(e)}"}), 500
+        return jsonify({'error': f"An error occurred while fetching Makoni submissions: {str(e)}"}), 500
 
 
 # API to fetch Nyanga-specific submissions
@@ -767,7 +767,40 @@ def get_nyanga_submissions():
     except Exception as e:
         return jsonify({'error': f"An error occurred while fetching Nyanga submissions: {str(e)}"}), 500
 
+# API to fetch Mutare-specific submissions
+@main.route('/api/mutare_submissions', methods=['GET'])
+def get_mutare_submissions():
+    try:
+        permits = Permit.query.filter(
+            (Permit.origin_district.ilike('%Mutare%')) |
+            (Permit.destination_district.ilike('%Mutare%'))
+        ).all()
 
+        results = [{
+            'id': permit.id,
+            'salutation': permit.salutation,
+            'name': permit.name,
+            'address': permit.address,
+            'number_of_animals': permit.number_of_animals,
+            'animal_type': permit.animal_type,
+            'cattle_type': permit.cattle_type,
+            'other_animal_type': permit.other_animal_type,
+            'origin': permit.origin,
+            'origin_district': permit.origin_district,
+            'destination': permit.destination,
+            'destination_district': permit.destination_district,
+            'movement_period': permit.movement_period,
+            'route': permit.route,
+            'payment_amount': permit.payment_amount,
+            'payment_amount_in_words': permit.payment_amount_in_words,
+            'date': permit.date.strftime('%Y-%m-%d'),
+            'status': permit.status
+        } for permit in permits]
+
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({'error': f"An error occurred while fetching Mutare submissions: {str(e)}"}), 500
 
 
 # Corrected code:
