@@ -243,19 +243,19 @@
     salutation: document.getElementById('salutation').value,
     name: document.getElementById('name').value,
     address: document.getElementById('address').value,
-    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0, // ✅ Fixed field name
-    animal_type: document.getElementById('animalType').value, // ✅ Fixed field name
-    cattle_type: document.getElementById('cattleType')?.value || '', // ✅ Fixed field name
-    other_animal_type: document.getElementById('otherAnimalType')?.value || '', // ✅ Fixed field name
+    number_of_animals: parseInt(document.getElementById('numberOfAnimals').value) || 0,  
+    animal_type: document.getElementById('animalType').value,  
+    cattle_type: document.getElementById('cattleType')?.value || '',  
+    other_animal_type: document.getElementById('otherAnimalType')?.value || '',  
     origin: document.getElementById('origin').value,
-    origin_district: document.getElementById('originDistrict').value, // ✅ Fixed field name
+    origin_district: document.getElementById('originDistrict').value,  
     destination: document.getElementById('destination').value,
-    destination_district: document.getElementById('destinationDistrict').value, // ✅ Fixed field name
-    movement_period: parseInt(document.getElementById('movementPeriod').value) || 0,  // ✅ Fixed field name
+    destination_district: document.getElementById('destinationDistrict').value,  
+    movement_period: document.getElementById('movementPeriod').value,  
     route: document.getElementById('route').value,
-    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,  // ✅ Fixed field name
-    payment_amount_in_words: document.getElementById('paymentAmountInWords').value, // ✅ Fixed field name
-    date: document.getElementById('submissionDate').value  // ✅ Fixed field name
+    payment_amount: parseFloat(document.getElementById('paymentAmount').value) || 0.0,  
+    payment_amount_in_words: document.getElementById('paymentAmountInWords').value,  
+    date: document.getElementById('submissionDate').value  
 };
 
 
