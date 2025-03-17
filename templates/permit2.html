@@ -1,626 +1,145 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Permit Submissions</title>
-
     <style>
-
-        /* Basic styling for tables and popup */
-
-        table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-            margin: 20px 0;
-
-        }
-
-        th, td {
-
-            border: 1px solid #ddd;
-
-            padding: 8px;
-
-            text-align: left;
-
-        }
-
-        th {
-
-            background-color: #f4f4f4;
-
-            cursor: pointer;
-
-        }
-
-        .popup, .overlay {
-
-            display: none;
-
-            position: fixed;
-
-            top: 50%;
-
-            left: 50%;
-
-            transform: translate(-50%, -50%);
-
-            z-index: 1000;
-
-        }
-
-        .popup {
-
-            width: 15cm;
-
-            height: auto;
-
-            background: white;
-
-            border: 1px solid #ccc;
-
-            padding: 20px;
-
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-
-        }
-
-        .overlay {
-
-            width: 100%;
-
-            height: 100%;
-
-            background: rgba(0, 0, 0, 0.5);
-
-        }
-
-        .popup h3 {
-
-            margin-top: 0;
-
-        }
-
-        .close-popup {
-
-            display: block;
-
-            margin-top: 20px;
-
-            text-align: center;
-
-            cursor: pointer;
-
-            color: #007BFF;
-
-        }
-
-        button {
-
-            cursor: pointer;
-
-        }
-
-
-        /* Styling for the filter form */
-
-        .container {
-
-            width: 90%;
-
-            max-width: 900px;
-
-            margin: 20px auto;
-
-            background-color: #fff;
-
-            padding: 30px;
-
-            border-radius: 10px;
-
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
-        }
-
-        .header {
-
-            text-align: center;
-
-            margin-bottom: 20px;
-
-        }
-
-        .form-section {
-
-            margin-bottom: 15px;
-
-        }
-
-        form label {
-
-            display: block;
-
-            font-weight: bold;
-
-            margin-bottom: 5px;
-
-        }
-
-        form select {
-
-            width: 100%;
-
-            padding: 10px;
-
-            font-size: 16px;
-
-            border: 1px solid #ccc;
-
-            border-radius: 5px;
-
-        }
-
-        .submit-btn {
-
-            background-color: #4CAF50;
-
-            color: white;
-
-            padding: 10px 20px;
-
-            border: none;
-
-            border-radius: 5px;
-
-            cursor: pointer;
-
-        }
-
-        .submit-btn:hover {
-
-            background-color: #45a049;
-
-        }
-
+        /* General Styles */
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 0; background-color: #f9f9f9; }
+        .container { width: 90%; max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        h1 { text-align: center; }
+        a { text-decoration: none; margin-right: 10px; }
+
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; cursor: pointer; }
+        button { cursor: pointer; padding: 5px 10px; border: none; background: #007BFF; color: white; border-radius: 3px; }
+        button:hover { background: #0056b3; }
+
+        /* Popup & Overlay */
+        .overlay, .popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .overlay { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999; }
+        .popup { background: white; padding: 20px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); z-index: 1000; }
+        .popup h3 { margin-top: 0; }
+        .close-popup { display: block; margin-top: 20px; text-align: center; cursor: pointer; color: #007BFF; }
     </style>
-
 </head>
-
 <body>
-<a href="{{ url_for('main.mutare_submissions_page') }}">View Mutare</a>
-<a href="{{ url_for('main.mutasa_submissions_page') }}">View Mutasa </a>
-<a href="{{ url_for('main.buhera_submissions_page') }}">View Buhera </a>
-<a href="{{ url_for('main.chimanimani_submissions_page') }}">View Chimanimani </a>
-<a href="{{ url_for('main.chipinge_submissions_page') }}">View Chipinge </a>
-<a href="{{ url_for('main.makoni_submissions_page') }}">View Makoni </a>
-<a href="{{ url_for('main.nyanga_submissions_page') }}">View Nyanga </a>
-<a href="{{ url_for('main.form_page') }}" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Submit a Permit</a>
-
-
-
     <div class="container">
-
-        <div class="header">
-
-            <h1>Search and Filter Movement Permits</h1>
-
-        </div>
-
-
-        <!-- Filter Form -->
-
+        <h1>Search and Filter Movement Permits</h1>
         <form id="filterForm">
-
-            <div class="form-section">
-
-                <label for="district">District:</label>
-
-                <select id="district" name="district">
-
-                    <option value="">All</option> <!-- New "All" option -->
-
-                    <option value="Mutare">Mutare</option>
-
-                    <option value="Mutasa">Mutasa</option>
-
-                    <option value="Nyanga">Nyanga</option>
-
-                    <option value="Makoni">Makoni</option>
-
-                    <option value="Chimanimani">Chimanimani</option>
-
-                    <option value="Buhera">Buhera</option>
-
-                    <option value="Chipinge">Chipinge</option>
-
-                </select>
-
-            </div>
-
-            <button type="submit" class="submit-btn">Search</button>
-
+            <label for="district">District:</label>
+            <select id="district" name="district">
+                <option value="">All</option>
+                <option value="Mutare">Mutare</option>
+                <option value="Mutasa">Mutasa</option>
+                <option value="Nyanga">Nyanga</option>
+                <option value="Makoni">Makoni</option>
+                <option value="Chimanimani">Chimanimani</option>
+                <option value="Buhera">Buhera</option>
+                <option value="Chipinge">Chipinge</option>
+            </select>
+            <button type="submit">Search</button>
         </form>
-
     </div>
-
-
-    <!-- Permit Submissions Table -->
 
     <h1>Permit Submissions</h1>
-
     <table id="permitTable">
-
         <thead>
-
             <tr>
-
                 <th onclick="sortTable(0)">Date</th>
-
-                <th onclick="sortTable(1)">Name</th>
-
-                <th onclick="sortTable(2)">Origin District</th>
-
-                <th onclick="sortTable(3)">Destination District</th>
-
-                <th onclick="sortTable(4)">Number of Animals</th>
-
-                <th onclick="sortTable(5)">Payment Amount</th>
-
-                <th onclick="sortTable(6)">Status</th>
-
+                <th onclick="sortTable(1)">ID</th>
+                <th onclick="sortTable(2)">Name</th>
+                <th onclick="sortTable(3)">Origin District</th>
+                <th onclick="sortTable(4)">Destination District</th>
+                <th onclick="sortTable(5)">Number of Animals</th>
+                <th onclick="sortTable(6)">Payment Amount</th>
                 <th>Actions</th>
-
             </tr>
-
         </thead>
-
-        <tbody>
-
-    <!-- Popup -->
-
-            <!-- Dynamic rows will be appended here -->
-
-        </tbody>
-
+        <tbody></tbody>
     </table>
 
-
-    <div class="overlay" id="overlay"></div>
-
+    <div class="overlay" id="overlay" onclick="closePopup()"></div>
     <div class="popup" id="popup">
-
         <div id="popupContent"></div>
-
         <span class="close-popup" onclick="closePopup()">Close</span>
-
     </div>
 
-
     <script>
-
-        // Fetch and display submissions on page load
-
         async function fetchSubmissions() {
-
             try {
-
                 const response = await fetch('/api/submissions');
-
                 const permits = await response.json();
-
-
-                const tableBody = document.getElementById('permitTable').querySelector('tbody');
-
+                const tableBody = document.querySelector('#permitTable tbody');
+                tableBody.innerHTML = '';
+                
                 permits.forEach(permit => {
-
                     const row = document.createElement('tr');
-
-                    row.dataset.id = permit.id; // Set data-id for each row
-
                     row.innerHTML = `
-
                         <td>${permit.date}</td>
-
                         <td><a href="#" onclick="showDetails(${permit.id})">${permit.name}</a></td>
-
                         <td>${permit.origin_district}</td>
-
                         <td>${permit.destination_district}</td>
-
                         <td>${permit.number_of_animals}</td>
-
                         <td>${permit.payment_amount}</td>
-
-                        <td>${permit.status}</td>
-
                         <td>
-
                             <button onclick="editPermit(${permit.id})">Edit</button>
-
                             <button onclick="deletePermit(${permit.id})">Delete</button>
-
-                        </td>
-
-                    `;
-
+                        </td>`;
                     tableBody.appendChild(row);
-
                 });
-
             } catch (error) {
-
                 console.error('Error fetching submissions:', error);
-
-                alert('Failed to fetch submissions. Please try again later.');
-
             }
-
         }
-
-
-        // Show permit details in a popup
 
         async function showDetails(id) {
-
             try {
-
                 const response = await fetch(`/api/submissions/${id}`);
-
                 const permit = await response.json();
-
-
-                if (response.ok) {
-
-                    const popupContent = document.getElementById('popupContent');
-
-                    popupContent.innerHTML = `
-
-                        <h3>Permit Summary</h3>
-
-                        <p><strong>Name:</strong> ${permit.salutation} ${permit.name}</p>
-
-                        <p><strong>Number of Animals:</strong> ${permit.number_of_animals}</p>
-
-                        <p><strong>Animal Type:</strong> ${permit.animal_type}</p>
-
-                        <p><strong>Origin:</strong> ${permit.origin_district}</p>
-
-                        <p><strong>Destination:</strong> ${permit.destination_district}</p>
-
-                        <p><strong>Movement Period:</strong> ${permit.movement_period} days</p>
-
-                        <p><strong>Route:</strong> ${permit.route}</p>
-
-                        <p><strong>Amount Paid:</strong> ${permit.payment_amount} USD</p>
-
-                        <p><strong>Amount in Words:</strong> ${permit.payment_amount_in_words}</p>
-
-                    `;
-
-                    document.getElementById('overlay').style.display = 'block';
-
-                    document.getElementById('popup').style.display = 'block';
-
-                } else {
-
-                    alert(permit.error || 'Failed to fetch permit details.');
-
-                }
-
+                if (!response.ok) throw new Error(permit.error);
+                
+                document.getElementById('popupContent').innerHTML = `
+                    <h3>Permit Summary</h3>
+                    <p><strong>Name:</strong> ${permit.name}</p>
+                    <p><strong>Number of Animals:</strong> ${permit.number_of_animals}</p>
+                    <p><strong>Origin:</strong> ${permit.origin_district}</p>
+                    <p><strong>Destination:</strong> ${permit.destination_district}</p>
+                    <p><strong>Amount Paid:</strong> ${permit.payment_amount} USD</p>`;
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('popup').style.display = 'block';
             } catch (error) {
-
-                console.error('Error fetching permit details:', error);
-
-                alert('An error occurred. Please try again.');
-
+                alert('Error fetching permit details');
             }
-
         }
-
-
-        // Close the popup
 
         function closePopup() {
-
             document.getElementById('overlay').style.display = 'none';
-
             document.getElementById('popup').style.display = 'none';
-
         }
-
-
-        // Sort table by column
-
-        function sortTable(columnIndex) {
-
-            const table = document.getElementById('permitTable');
-
-            const rows = Array.from(table.rows).slice(1);
-
-            const isNumeric = !isNaN(rows[0].cells[columnIndex].innerText.trim());
-
-
-            rows.sort((rowA, rowB) => {
-
-                const cellA = rowA.cells[columnIndex].innerText.trim();
-
-                const cellB = rowB.cells[columnIndex].innerText.trim();
-
-                return isNumeric ? parseFloat(cellA) - parseFloat(cellB) : cellA.localeCompare(cellB);
-
-            });
-
-
-            rows.forEach(row => table.appendChild(row)); // Reorder rows
-
-        }
-
-
-        // Edit permit
-
-        async function editPermit(id) {
-
-            try {
-
-                const response = await fetch(`/api/submissions/${id}`);
-
-                const permit = await response.json();
-
-
-                if (response.ok) {
-
-                    sessionStorage.setItem('permitData', JSON.stringify(permit));
-
-                    window.location.href = `/form?id=${id}`;
-
-                } else {
-
-                    alert(permit.error || 'Failed to fetch permit data.');
-
-                }
-
-            } catch (error) {
-
-                console.error('Error fetching permit data:', error);
-
-                alert('An error occurred. Please try again.');
-
-            }
-
-        }
-
-
-        // Delete permit
 
         async function deletePermit(id) {
-
-            if (confirm('Are you sure you want to delete this permit?')) {
-
+            if (confirm('Are you sure?')) {
                 try {
-
                     const response = await fetch(`/delete/${id}`, { method: 'DELETE' });
-
-                    const result = await response.json();
-
-
-                    if (response.ok) {
-
-                        alert(result.message);
-
-                        document.querySelector(`#permitTable tr[data-id='${id}']`).remove();
-
-                    } else {
-
-                        alert(result.error);
-
-                    }
-
+                    if (response.ok) document.querySelector(`#permitTable tr[data-id='${id}']`).remove();
                 } catch (error) {
-
-                    console.error('Error deleting permit:', error);
-
-                    alert('An error occurred. Please try again.');
-
+                    alert('Error deleting permit');
                 }
-
             }
-
         }
 
-
-        // Initialize
-
-        fetchSubmissions();
-
-
-        // Filter functionality
-
-        document.getElementById('filterForm').addEventListener('submit', function(event) {
-
+        document.getElementById('filterForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-
-
             const district = document.getElementById('district').value;
-
-
-            // Fetch filtered data
-
-            fetch(`/api/submissions?district=${district}`)
-
-                .then(response => response.json())
-
-                .then(data => {
-
-                    const tableBody = document.getElementById('permitTable').querySelector('tbody');
-
-                    tableBody.innerHTML = ''; // Clear previous results
-
-
-                    if (data.length > 0) {
-
-                        data.forEach(permit => {
-
-                            const row = document.createElement('tr');
-
-                            row.dataset.id = permit.id;
-
-                            row.innerHTML = `
-
-                                <td>${permit.date}</td>
-
-                                <td><a href="#" onclick="showDetails(${permit.id})">${permit.name}</a></td>
-
-                                <td>${permit.origin_district}</td>
-
-                                <td>${permit.destination_district}</td>
-
-                                <td>${permit.number_of_animals}</td>
-
-                                <td>${permit.payment_amount}</td>
-
-                                <td>${permit.status}</td>
-
-                                <td>
-
-                                    <button onclick="editPermit(${permit.id})">Edit</button>
-
-                                    <button onclick="deletePermit(${permit.id})">Delete</button>
-
-                                </td>
-
-                            `;
-
-                            tableBody.appendChild(row);
-
-                        });
-
-                    } else {
-
-                        alert('No results found');
-
-                    }
-
-                })
-
-                .catch(error => {
-
-                    console.error('Error fetching filtered results:', error);
-
-                });
-
+            fetchSubmissions(`/api/submissions?district=${district}`);
         });
 
+        fetchSubmissions();
     </script>
-
 </body>
+</html>
 
-</html> 
