@@ -185,25 +185,26 @@
             </tbody>
         </table>
     </div>
+    
+   <!-- Overlay for all popups -->
+<div class="overlay" id="overlay" onclick="closePopup()"></div>
 
-    <!-- Popup for Disapproval Reason -->
-    <div class="overlay" id="overlay"></div>
-    <div class="popup" id="popup">
-        <h3>Provide Disapproval Reason</h3>
-        <textarea id="disapprovalReason" rows="4" cols="50" placeholder="Enter reason for disapproval"></textarea>
-        <button onclick="submitDisapproval()">Submit</button>
-        <span class="close-popup" onclick="closePopup()">Close</span>
-    </div>
-</div>
-      <!-- Overlay and Popup for Permit Details -->
-<!-- Overlay for background dim -->
-<div class="overlay" id="overlay"></div>
-
-<!-- Popup window -->
-<div class="popup" id="popup">
+<!-- Permit Details Popup -->
+<div class="popup" id="detailsPopup">
     <div id="popupContent"></div>
     <span class="close-popup" onclick="closePopup()">Close</span>
 </div>
+
+<!-- Disapproval Popup -->
+<div class="popup" id="disapprovalPopup">
+    <h3>Provide Disapproval Reason</h3>
+    <textarea id="disapprovalReason" rows="4" cols="50" placeholder="Enter reason for disapproval"></textarea>
+    <button onclick="submitDisapproval()">Submit</button>
+    <span class="close-popup" onclick="closePopup()">Close</span>
+</div>
+
+</div>
+
 
 <script>
     let disapprovalId = null;
@@ -247,7 +248,7 @@
                 row.innerHTML = `
                     <td>${permit.date || 'N/A'}</td>
                     <td>${permit.id}</td>
-                    <td>${permit.name || 'Unknown'}</td>
+                    <td><a href="#" onclick="showDetails(${permit.id})">${permit.name || 'Unknown'}</a></td>
                     <td>${permit.origin_district || 'Unknown'}</td>
                     <td>${permit.destination_district || 'Unknown'}</td>
                     <td>${permit.number_of_animals || '0'}</td>
@@ -264,18 +265,55 @@
         }
     }
 
-    // Show disapproval popup
-    function showDisapprovalPopup(permitId) {
-        disapprovalId = permitId;
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('popup').style.display = 'block';
-    }
+    // Show permit details in a popup
+async function showDetails(id) {
+    try {
+        const detailsButton = document.querySelector(`tr[data-id="${id}"] a`);
+        detailsButton.style.pointerEvents = "none";  // Disable click
 
-    // Close disapproval popup
-    function closePopup() {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('popup').style.display = 'none';
+        const response = await fetch(`/api/submissions/${id}`);
+        const permit = await response.json();
+
+        if (!response.ok || !permit.name) {
+            throw new Error('Invalid permit data');
+        }
+
+        const popupContent = document.getElementById('popupContent');
+        popupContent.innerHTML = `
+            <h3>Permit Summary</h3>
+            <p><strong>Name:</strong> ${permit.name}</p>
+            <p><strong>Number of Animals:</strong> ${permit.number_of_animals}</p>
+            <p><strong>Animal Type:</strong> ${permit.animal_type}</p>
+            <p><strong>Origin:</strong> ${permit.origin_district}</p>
+            <p><strong>Destination:</strong> ${permit.destination_district}</p>
+            <p><strong>Movement Period:</strong> ${permit.movement_period} days</p>
+            <p><strong>Route:</strong> ${permit.route}</p>
+            <p><strong>Status:</strong> ${permit.status}</p>
+        `;
+
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('detailsPopup').style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching permit details:', error);
+        alert('Failed to load permit details.');
+    } finally {
+        detailsButton.style.pointerEvents = "auto"; // Re-enable click
     }
+}
+
+// Show disapproval popup
+function showDisapprovalPopup(permitId) {
+    disapprovalId = permitId;
+    document.getElementById('overlay').style.display = 'block';
+    document.getElementById('disapprovalPopup').style.display = 'block';
+}
+
+// Close any popup
+function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('detailsPopup').style.display = 'none';
+    document.getElementById('disapprovalPopup').style.display = 'none';
+}
 
     // Submit disapproval reason
     function submitDisapproval() {
@@ -321,6 +359,17 @@
 
     // Run fetchMutareSubmissions when page loads
     document.addEventListener("DOMContentLoaded", fetchMutareSubmissions);
+
+
+
+function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+    
+    const popups = document.querySelectorAll('.popup');
+    popups.forEach(popup => popup.style.display = 'none');
+}
+
+
 </script>
 
 </html>
