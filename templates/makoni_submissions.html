@@ -116,6 +116,42 @@
             padding: 20px;
             box-sizing: border-box;
         }
+        /* Basic styling for popup and overlay */
+.popup, .overlay {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.popup {
+    width: 15cm;
+    height: auto;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.popup h3 {
+    margin-top: 0;
+}
+
+.close-popup {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    cursor: pointer;
+    color: #007BFF;
+}
     </style>
 </head>
 <body>
@@ -148,82 +184,142 @@
         </table>
     </div>
 
-    <!-- Popup for Disapproval Reason -->
-    <div class="overlay" id="overlay"></div>
-    <div class="popup" id="popup">
-        <h3>Provide Disapproval Reason</h3>
-        <textarea id="disapprovalReason" rows="4" cols="50" placeholder="Enter reason for disapproval"></textarea>
-        <button onclick="submitDisapproval()">Submit</button>
-        <span class="close-popup" onclick="closePopup()">Close</span>
-    </div>
+   <!-- Overlay for all popups -->
+<div class="overlay" id="overlay" onclick="closePopup()"></div>
+
+<!-- Permit Details Popup -->
+<div class="popup" id="detailsPopup">
+    <div id="popupContent"></div>
+    <span class="close-popup" onclick="closePopup()">Close</span>
 </div>
+
+<!-- Disapproval Popup -->
+<div class="popup" id="disapprovalPopup">
+    <h3>Provide Disapproval Reason</h3>
+    <textarea id="disapprovalReason" rows="4" cols="50" placeholder="Enter reason for disapproval"></textarea>
+    <button onclick="submitDisapproval()">Submit</button>
+    <span class="close-popup" onclick="closePopup()">Close</span>
+</div>
+
+</div>
+
+
 
 <script>
     let disapprovalId = null;
 
     // Fetch and display submissions
     async function fetchMakoniSubmissions() {
-        try {
-            const response = await fetch('/api/makoni_submissions'); 
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+    try {
+        const response = await fetch('/api/makoni_submissions'); 
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const permits = await response.json();
+        console.log("Fetched permits:", permits);
+if (permits.length === 0) {
+    console.warn("No permits found.");
+}
+
+
+        const tableBody = document.getElementById('permitTable')?.querySelector('tbody');
+        if (!tableBody) {
+            console.error("Error: Table element not found.");
+            return;
+        }
+
+        tableBody.innerHTML = ''; // Clear existing table rows
+
+        const userRole = localStorage.getItem("userRole") || "guest"; // Default to 'guest'
+
+        permits.forEach(permit => {
+            const row = document.createElement('tr');
+            row.dataset.id = permit.id;
+
+            let actionButtons = "";
+            if (userRole === "district") {
+                actionButtons = `
+                    <button class="approve-btn" onclick="handleApprove(this, ${permit.id})">Approve</button>
+                    <button class="disapprove-btn" onclick="handleDisapprove(this, ${permit.id})">Disapprove</button>
+                `;
+            } else if (userRole === "veo") {
+                actionButtons = `<button class="disabled-btn" disabled>Not authorized</button>`;
             }
 
-            const permits = await response.json();
-            console.log("Fetched permits:", permits); // Debugging log
+            row.innerHTML = `
+                <td>${permit.date || 'N/A'}</td>
+                <td>${permit.id}</td>
+                <td><a href="#" onclick="showDetails(${permit.id})">${permit.name || 'Unknown'}</a></td>
+                <td>${permit.origin_district || 'Unknown'}</td>
+                <td>${permit.destination_district || 'Unknown'}</td>
+                <td>${permit.number_of_animals || '0'}</td>
+                <td>${permit.payment_amount || '0.00'} USD</td>
+                <td id="permit-status-${permit.id}">${permit.status || 'Pending'}</td>
+                <td>${actionButtons}</td>
+            `;
+            tableBody.appendChild(row);
+        });
 
-            const tableBody = document.getElementById('permitTable').querySelector('tbody');
-            tableBody.innerHTML = ''; // Clear existing table rows
+    } catch (error) {
+        console.error('Error fetching submissions:', error);
+        alert(`Failed to fetch submissions: ${error.message}`);
+    }
+}
 
-            const userRole = localStorage.getItem("userRole"); // Retrieve user role from storage
+async function showDetails(id) {
+    try {
+        console.log(`Opening popup for permit ID: ${id}`);
+       
+        const response = await fetch(`/api/submissions/${id}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-            permits.forEach(permit => {
-                const row = document.createElement('tr');
-                row.dataset.id = permit.id;
+        const permit = await response.json();
+        if (!permit.name) {
+            throw new Error('Invalid permit data');
+        }
 
-                let actionButtons = "";
-                if (userRole === "district") {
-                    actionButtons = `
-                        <button class="approve-btn" onclick="approvePermit(${permit.id})">Approve</button>
-                        <button class="disapprove-btn" onclick="showDisapprovalPopup(${permit.id})">Disapprove</button>
-                    `;
-                } else if (userRole === "veo") {
-                    actionButtons = `<button class="disabled-btn" disabled>Not authorized</button>`;
-                }
+        const popup = document.getElementById('detailsPopup');
+        const overlay = document.getElementById('overlay');
+        const popupContent = document.getElementById('popupContent');
 
-                row.innerHTML = `
-                    <td>${permit.date}</td>
-                    <td>${permit.id}</td>
-                    <td>${permit.name}</td>
-                    <td>${permit.origin_district}</td>
-                    <td>${permit.destination_district}</td>
-                    <td>${permit.number_of_animals}</td>
-                    <td>${permit.payment_amount}</td>
-                    <td id="permit-status-${permit.id}">${permit.status || 'Pending'}</td>
-                    <td>${actionButtons}</td>
-                `;
-                tableBody.appendChild(row);
-            });
+        popupContent.innerHTML = `
+            <h3>Permit Summary</h3>
+            <p><strong>Name:</strong> ${permit.name}</p>
+            <p><strong>Number of Animals:</strong> ${permit.number_of_animals}</p>
+            <p><strong>Animal Type:</strong> ${permit.animal_type}</p>
+            <p><strong>Origin:</strong> ${permit.origin_district}</p>
+            <p><strong>Destination:</strong> ${permit.destination_district}</p>
+            <p><strong>Movement Period:</strong> ${permit.movement_period} days</p>
+            <p><strong>Route:</strong> ${permit.route}</p>
+            <p><strong>Status:</strong> ${permit.status}</p>
+        `;
 
-        } catch (error) {
-            console.error('Error fetching submissions:', error);
-            alert(`Failed to fetch submissions: ${error.message}`);
+        overlay.style.display = 'block';
+        popup.style.display = 'block';
+
+    } catch (error) {
+        console.error('Error fetching permit details:', error);
+        alert('Failed to load permit details.');
+    } finally {
+        if (detailsButton) {
+            detailsButton.style.pointerEvents = "auto"; // Re-enable click
         }
     }
+}
 
-    // Show disapproval popup
-    function showDisapprovalPopup(permitId) {
-        disapprovalId = permitId;
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('popup').style.display = 'block';
-    }
 
-    // Close disapproval popup
-    function closePopup() {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('popup').style.display = 'none';
-    }
+
+
+// Close any popup
+function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('detailsPopup').style.display = 'none';
+    document.getElementById('disapprovalPopup').style.display = 'none';
+}
 
     // Submit disapproval reason
     function submitDisapproval() {
@@ -250,26 +346,50 @@
         }
     }
 
-    // Approve permit
-    function approvePermit(permitId) {
-        fetch(`/permit/${permitId}/approve`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert('Permit approved successfully!');
-            document.getElementById(`permit-status-${permitId}`).innerText = 'Approved';
-        })
-        .catch(error => {
-            console.error('Error approving permit:', error);
-            alert('Error approving permit.');
-        });
-    }
-
-    // Run fetchMakoniSubmissions when page loads
+    
+    // Run fetchMutareSubmissions when page loads
     document.addEventListener("DOMContentLoaded", fetchMakoniSubmissions);
-</script>
 
+
+
+function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+    
+    const popups = document.querySelectorAll('.popup');
+    popups.forEach(popup => popup.style.display = 'none');
+}
+
+function handleApprove(button, permitId) {
+    button.disabled = true; // Disable button to prevent multiple clicks
+    fetch(`/permit/${permitId}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Permit approved successfully!');
+        const statusElement = document.getElementById(`permit-status-${permitId}`);
+if (statusElement) statusElement.innerText = 'Approved';
+
+    })
+    .catch(error => {
+        console.error('Error approving permit:', error);
+        alert('Error approving permit.');
+    })
+    .finally(() => {
+        button.disabled = false; // Re-enable after request
+    });
+}
+
+function handleDisapprove(button, permitId) {
+    disapprovalId = permitId;
+    console.log(`Showing disapproval popup for permit ID: ${permitId}`);
+    document.getElementById('disapprovalReason').value = ''; // Clear input field
+document.getElementById('overlay').style.display = 'block';
+document.getElementById('disapprovalPopup').style.display = 'block';
+}
+
+
+</script>
 </html>
 
