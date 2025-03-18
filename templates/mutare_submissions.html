@@ -272,11 +272,7 @@ if (permits.length === 0) {
 async function showDetails(id) {
     try {
         console.log(`Opening popup for permit ID: ${id}`);
-        const detailsButton = document.querySelector(`tr[data-id="${id}"] a`);
-        if (detailsButton) {
-            detailsButton.style.pointerEvents = "none"; // Disable click
-        }
-
+       
         const response = await fetch(`/api/submissions/${id}`);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
