@@ -178,6 +178,23 @@
                     <th>Payment Amount</th>
                     <th>Status</th>
                     <th>Actions</th>
+                    <!-- Add this to your form or table header -->
+<th>Verified</th>
+
+<!-- Inside your permit loop, add the checkbox -->
+<td>
+  <input type="checkbox" name="checked_permit" 
+         id="checked_{{ permit.id }}" 
+         class="permit-check" 
+         {% if permit.checked %}checked{% endif %}>
+</td>
+
+<!-- Modify your approve button to check verification -->
+<button type="submit" name="approve" value="{{ permit.id }}" 
+        class="approve-btn" 
+        {% if not permit.checked %}disabled{% endif %}>
+  Approve
+</button>
                 </tr>
             </thead>
             <tbody>
@@ -390,7 +407,26 @@ document.getElementById('overlay').style.display = 'block';
 document.getElementById('disapprovalPopup').style.display = 'block';
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+  // Enable/disable approve button based on checkbox
+  document.querySelectorAll('.permit-check').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const permitId = this.id.split('_')[1];
+      const approveBtn = document.querySelector(`button[value="${permitId}"]`);
+      approveBtn.disabled = !this.checked;
+    });
+  });
 
+  // District validation
+  const userDistrict = "{{ current_user.district }}"; // You'll need to pass this from backend
+  document.querySelectorAll('.approve-btn').forEach(btn => {
+    const permitDest = btn.closest('tr').querySelector('.dest-district').textContent;
+    if (permitDest !== userDistrict) {
+      btn.disabled = true;
+      btn.title = "Only destination district can approve";
+    }
+  });
+});
 </script>
 
 </html>

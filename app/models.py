@@ -41,5 +41,11 @@ class AuditLog(db.Model):
     reason = db.Column(db.String(255))
 
     permit = db.relationship('Permit', backref=db.backref('audit_logs', lazy=True))
+    
+    
+    checked = db.Column(db.Boolean, default=False, nullable=False)
+checked_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # If you want to track who checked it
+approved_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+approval_date = db.Column(db.DateTime)
 
-
+ 

@@ -467,15 +467,65 @@ def edit_permit(id):
 # Route to approve a permit
 @main.route('/permit/<int:permit_id>/approve', methods=['POST'])
 def approve_permit(permit_id):
-    permit = Permit.query.get(permit_id)
-
-    if permit:
-        permit.status = 'Approved'
-        db.session.commit()
-        return jsonify({"message": "Permit approved successfully!"}), 200
+    # Get current user (assuming you're using Flask-Login)
+    current_user = get_current_user()  # You'll need to implement this based on your auth system
     
-    return jsonify({"message": "Permit not found!"}), 404
-
+    # Get the permit or return 404
+    permit = Permit.query.get_or_404(permit_id)
+    
+    # Validation 1: Check if permit is verified/checked
+    if not permit.checked:
+        return jsonify({
+            "message": "Permit must be verified (checked) before approval",
+            "success": False
+        }), 400
+    
+    # Validation 2: Check if current user is from destination district
+    if current_user.district != permit.destination_district:
+        return jsonify({
+            "message": "Only officials from the destination district can approve permits",
+            "success": False
+        }), 403
+    
+    # Validation 3: Check if permit isn't already approved
+    if permit.status == 'Approved':
+        return jsonify({
+            "message": "Permit is already approved",
+            "success": False
+        }), 400
+    
+    # All validations passed - approve the permit
+    permit.status = 'Approved'
+    permit.approved_by = current_user.id  # Track who approved it
+    permit.approval_date = datetime.utcnow()  # Track when it was approved
+    
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "Permit approved successfully!",
+            "success": True
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "message": f"Error approving permit: {str(e)}",
+            "success": False
+        }), 500
+        
+@main.route('/permit/<int:permit_id>/check', methods=['POST'])
+def check_permit(permit_id):
+    permit = Permit.query.get_or_404(permit_id)
+    permit.checked = not permit.checked  # Toggle checked status
+    permit.checked_by = current_user.id
+    db.session.commit()
+    return jsonify({"checked": permit.checked})        
+        
+       
+        
+        
+        
+        
+   
 
 # Route to disapprove a permit
 @main.route('/permit/<int:permit_id>/disapprove', methods=['POST'])
