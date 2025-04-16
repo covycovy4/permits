@@ -555,6 +555,18 @@ def delete_permit_by_id(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+
+@main.route('/api/mutare_submissions')
+def mutare_submissions():
+    # Hardcode the district for testing
+    current_district = "Mutare"  # Change this to test different districts
+    
+    permits = Permit.query.filter(
+        Permit.destination_district == current_district,
+        Permit.status == 'Pending'
+    ).all()
+    
+    return jsonify([p.to_dict() for p in permits])
 # Routes to render submissions pages for various locations
 @main.route('/chimanimani_submissions')
 def chimanimani_submissions_page():
